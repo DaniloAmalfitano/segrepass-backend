@@ -12,7 +12,7 @@ export const app = express();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://segrepass.vercel.app"
+        "https://myuni-cfb7e.web.app"
     ],
     credentials: true,
     allowedHeaders: ["Content-Type","Authorization","X-Session-Id"],
