@@ -14,6 +14,14 @@ export async function connect(req, res) {
                 error: "Username e password sono obbligatori"
             });
         }
+        
+        const existingSession = await SessionManager.hasUserSession(username);
+
+        if (existingSession) {
+            return res.status(409).json({
+                error: "Esiste già una sessione attiva per questo username"
+            });
+        }
 
         const sessionId = crypto.randomUUID();
 
@@ -25,10 +33,17 @@ export async function connect(req, res) {
             password
         );
 
-        await SessionManager.create(
+        const created = await SessionManager.create(
             sessionId,
+            username,
             session
         );
+
+        if(!created) {
+            return res.status(409).json({
+                error: "Esiste già una sessione attiva per questo username"
+            });
+        }
 
         return res.status(200).json({
             message: "Connessione a Segrepass riuscita",

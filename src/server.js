@@ -1,5 +1,6 @@
 import { app } from "./app.js";
 import redisClient from "./redis.js";
+import cors from "cors";
 
 const PORT = process.env.PORT || 3000;
 
