@@ -13,7 +13,10 @@ app.use(cors({
     origin: [
         "http://localhost:5173",
         "https://myuni-cfb7e.web.app"
-    ]
+    ],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
 
 app.use(express.json());
