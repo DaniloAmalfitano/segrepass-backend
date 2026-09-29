@@ -12,11 +12,11 @@ export const app = express();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://segrepass-backend.vercel.app"
+        "https://segrepass.vercel.app"
     ],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "X-Session-Id"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allowedHeaders: ["Content-Type","Authorization","X-Session-Id"],
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"]
 }));
 
 app.use(express.json());
@@ -28,7 +28,6 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/segrepass", segrepassRoutes);
-
 app.use("/auth", authRoutes);
 
 export default app;
