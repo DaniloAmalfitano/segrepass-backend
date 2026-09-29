@@ -9,7 +9,7 @@ import { requireAuth } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.post("/connect", requireAuth, connect);
+router.post("/connect", connect);
 router.get("/transcript", requireAuth, getTranscript);
 router.get("/study-plan", requireAuth, getStudyPlan);
 router.get("/student-summary", requireAuth, getStudentSummary);

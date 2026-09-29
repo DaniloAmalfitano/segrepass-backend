@@ -1,51 +1,35 @@
-import crypto from "crypto";
+import SessionManager from "../services/session/SessionManager.js";
 
-const sessions = new Map();
+export const requireAuth = async (req, res, next) => {
 
-export const createAuthSession = (userId) => {
+    try {
 
-    const sessionId = crypto.randomUUID();
+        const sessionId = req.headers["x-session-id"];
 
-    sessions.set(sessionId, {
-        userId,
-        createdAt: Date.now()
-    });
-
-    return sessionId;
-};
-
-export const destroyAuthSession = (sessionId) => {
-    sessions.delete(sessionId);
-};
-
-export const requireAuth = (req, res, next) => {
-
-    const sessionId = req.headers["x-session-id"];
-
-    if (!sessionId) {
-        return res.status(401).json({
-            error: "Authentication required"
-        });
-    }
-
-    const session = sessions.get(sessionId);
-
-    if (!session) {
-        return res.status(401).json({
-            error: "Invalid session"
-        });
-    }
-
-    req.userId = session.userId;
-
-    next();
-};
-
-export const getSessionIdByUserId = (userId) => {
-    for (const [sessionId, session] of sessions) {
-        if (session.userId === userId) {
-            return sessionId;
+        if (!sessionId) {
+            return res.status(401).json({
+                error: "Authentication required"
+            });
         }
+
+        const session = await SessionManager.get(sessionId);
+
+        if (!session) {
+            return res.status(401).json({
+                error: "Invalid session"
+            });
+        }
+
+        req.sessionId = sessionId;
+
+        next();
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            error: "Errore durante l'autenticazione"
+        });
     }
-    return null;
 };
