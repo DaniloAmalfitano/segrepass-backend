@@ -13,28 +13,9 @@ class SessionManager {
         const sessionKey = `${SESSION_PREFIX}${sessionId}`;
         const userKey = `${USER_PREFIX}${username}`;
 
-        // Controlliamo se esiste già una sessione per questo username
-        const existingSessionId = await redisClient.get(userKey);
-
-        if (existingSessionId) {
-
-            // Verifichiamo che la sessione associata esista davvero
-            const sessionExists =
-                await redisClient.exists(
-                    `${SESSION_PREFIX}${existingSessionId}`
-                );
-
-            if (sessionExists) {
-                return false;
-            }
-
-            // L'associazione era rimasta senza sessione valida
-            await redisClient.del(userKey);
-        }
 
         const serialized = await session.jar.serialize();
 
-        // Salviamo la sessione
         await redisClient.set(
             sessionKey,
             JSON.stringify(serialized),
@@ -43,7 +24,7 @@ class SessionManager {
             }
         );
 
-        // Salviamo la relazione username → sessionId
+
         await redisClient.set(
             userKey,
             sessionId,

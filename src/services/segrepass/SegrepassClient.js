@@ -25,7 +25,6 @@ class SegrepassClient {
                 headers: {
                     Cookie: cookieHeader
                 },
-
                 dispatcher:
                     insecureDispatcher,
 

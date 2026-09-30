@@ -14,36 +14,15 @@ export async function connect(req, res) {
                 error: "Username e password sono obbligatori"
             });
         }
-        
-        const existingSession = await SessionManager.hasUserSession(username);
 
-        if (existingSession) {
-            return res.status(409).json({
-                error: "Esiste già una sessione attiva per questo username"
-            });
-        }
 
         const sessionId = crypto.randomUUID();
 
         const session = SegrepassClient.createSession();
 
-        await SegrepassClient.login(
-            session,
-            username,
-            password
-        );
+        await SegrepassClient.login(session, username, password);
 
-        const created = await SessionManager.create(
-            sessionId,
-            username,
-            session
-        );
-
-        if(!created) {
-            return res.status(409).json({
-                error: "Esiste già una sessione attiva per questo username"
-            });
-        }
+        await SessionManager.create(sessionId, username, session);
 
         return res.status(200).json({
             message: "Connessione a Segrepass riuscita",
@@ -54,10 +33,7 @@ export async function connect(req, res) {
 
         console.error(error);
 
-        return res.status(401).json({
-            error: "Login a Segrepass fallito"
-        });
-    }
+        return res.status(401).json({error: "Login a Segrepass fallito"});}
 }
 
 
@@ -70,16 +46,13 @@ export async function getTranscript(req, res) {
 
         if (!session) {
             return res.status(401).json({
-                error: "Sessione Segrepass non attiva"
-            });
+                error: "Sessione Segrepass non attiva"});
         }
 
         const html = await SegrepassClient.getTranscript(session);
         const transcript = await SegrepassParser.parseTranscript(html);
 
-        return res.status(200).json({
-            transcript
-        });
+        return res.status(200).json({transcript});
 
     } catch (error) {
 
@@ -90,7 +63,6 @@ export async function getTranscript(req, res) {
         });
     }
 }
-
 
 export async function getStudyPlan(req, res) {
 
