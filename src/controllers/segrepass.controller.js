@@ -52,7 +52,7 @@ export async function getTranscript(req, res) {
 
         const cached = await SegrepassCache.getTranscript(session.username);
 
-        if (cached) {
+        if (cached && cached.length > 0) {
             return res.status(200).json({
                 transcript: cached});
         }
@@ -91,7 +91,7 @@ export async function getStudyPlan(req, res) {
 
         const cached = await SegrepassCache.getStudyPlan(session.username);
 
-        if (cached) {
+        if (cached && cached.length > 0) {
             return res.status(200).json({
                 pianoDiStudi: cached
             });
@@ -133,7 +133,7 @@ export async function getStudentSummary(req, res) {
 
         const cached = await SegrepassCache.getStudentSummary(session.username);
         
-        if (cached) {
+        if (cached && cached.length > 0) {
             return res.status(200).json({
                 studentSummary: cached
             });
