@@ -1,6 +1,7 @@
 import SegrepassParser from "../services/parser/SegrepassParser.js";
 import SegrepassClient from "../services/segrepass/SegrepassClient.js";
 import SessionManager from "../services/session/SessionManager.js";
+import SegrepassCache from "../services/cache/SegrepassCache.js";
 import crypto from "crypto";
 
 export async function connect(req, res) {
@@ -49,10 +50,21 @@ export async function getTranscript(req, res) {
                 error: "Sessione Segrepass non attiva"});
         }
 
+        const cached = await SegrepassCache.getTranscript(session.username);
+
+        if (cached) {
+            return res.status(200).json({
+                transcript: cached});
+        }
+        
         const html = await SegrepassClient.getTranscript(session);
         const transcript = await SegrepassParser.parseTranscript(html);
 
-        return res.status(200).json({transcript});
+        await SegrepassCache.setTranscript(session.username, transcript);
+
+        return res.status(200).json({
+            transcript
+        });
 
     } catch (error) {
 
@@ -77,9 +89,19 @@ export async function getStudyPlan(req, res) {
             });
         }
 
+        const cached = await SegrepassCache.getStudyPlan(session.username);
+
+        if (cached) {
+            return res.status(200).json({
+                pianoDiStudi: cached
+            });
+        }   
+
         const html = await SegrepassClient.getStudyPlan(session);
         const pianoDiStudi =
             await SegrepassParser.parseStudyPlan(html);
+
+        await SegrepassCache.setStudyPlan(session.username, pianoDiStudi);
 
         return res.status(200).json({
             pianoDiStudi
@@ -109,11 +131,18 @@ export async function getStudentSummary(req, res) {
             });
         }
 
-        const html =
-            await SegrepassClient.getStudentSummary(session);
+        const cached = await SegrepassCache.getStudentSummary(session.username);
+        
+        if (cached) {
+            return res.status(200).json({
+                studentSummary: cached
+            });
+        }
 
-        const studentSummary =
-            await SegrepassParser.parseStudentSummary(html);
+        const html = await SegrepassClient.getStudentSummary(session);
+        const studentSummary = await SegrepassParser.parseStudentSummary(html);
+
+        await SegrepassCache.setStudentSummary(session.username, studentSummary);
 
         return res.status(200).json({
             studentSummary

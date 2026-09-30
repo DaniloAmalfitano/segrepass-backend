@@ -10,31 +10,36 @@ class SessionManager {
 
     async create(sessionId, username, session) {
 
-        const sessionKey = `${SESSION_PREFIX}${sessionId}`;
-        const userKey = `${USER_PREFIX}${username}`;
+    const sessionKey = `${SESSION_PREFIX}${sessionId}`;
+    const userKey = `${USER_PREFIX}${username}`;
 
+    const serialized = await session.jar.serialize();
 
-        const serialized = await session.jar.serialize();
+    const sessionData = {
+        username,
+        jar: serialized
+    };
 
-        await redisClient.set(
-            sessionKey,
-            JSON.stringify(serialized),
-            {
-                EX: SESSION_TTL
-            }
-        );
+    await redisClient.set(
+        sessionKey,
+        JSON.stringify(sessionData),
+        {
+            EX: SESSION_TTL
+        }
+    );
 
+    await redisClient.sAdd(
+        userKey,
+        sessionId
+    );
 
-        await redisClient.set(
-            userKey,
-            sessionId,
-            {
-                EX: SESSION_TTL
-            }
-        );
+    await redisClient.expire(
+        userKey,
+        SESSION_TTL
+    );
 
-        return true;
-    }
+    return true;
+}
 
     async get(sessionId) {
 
@@ -42,14 +47,16 @@ class SessionManager {
             `${SESSION_PREFIX}${sessionId}`
         );
 
-        if (!data) {
+        if (!data)
             return null;
-        }
+        
+        const sessionData = JSON.parse(data);
+        const jar = await CookieJar.deserialize(sessionData.jar);
 
-        const serialized = JSON.parse(data);
-        const jar = await CookieJar.deserialize(serialized);
-
-        return { jar };
+        return {
+            username: sessionData.username,
+            jar
+        };
     }
 
     async has(sessionId) {
