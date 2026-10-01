@@ -133,11 +133,8 @@ class SegrepassClient {
             );
 
         const loginHtml =await loginResponse.text();
-
         const $login =cheerio.load(loginHtml);
-
         const title =$login("title").text().trim();
-
         const loginSucceeded =title.includes("Menu Utente");
 
         if (!loginSucceeded) {
@@ -185,7 +182,6 @@ class SegrepassClient {
 
         async getTranscript(session) {
             const url =`${BASE_URL}/esis/caricaMenu.do?azione=esamiSostenuti&currentParent=link_1`;
-
             const response =await this.get(session,url);
 
             if (!response.ok) {
@@ -197,7 +193,6 @@ class SegrepassClient {
     async getStudyPlan(session) {
 
         const url =`${BASE_URL}/esis/caricaMenu.do?azione=pianiStudio&currentParent=link_1`;
-
         const response =await this.get(session,url)
 
         if (!response.ok) {
@@ -205,7 +200,34 @@ class SegrepassClient {
         }
         return await response.text();
     }
-    
+
+ async getStudentName(session) {
+    const url =`${BASE_URL}/esis/caricaMenu.do?azione=datiAnagrafici`;
+
+    const response = await this.get(session, url);
+
+    if (!response.ok) {
+        throw new Error(
+            `Errore recupero nome studente: HTTP ${response.status}`
+        );
+    }
+
+    return await response.text();
+}
+
+async getStudentId(session){
+    const url =`${BASE_URL}/esis/caricaMenu.do?azione=datiAnagrafici`;
+    const response = await this.get(session, url);
+
+    if (!response.ok) {
+        throw new Error(
+            `Errore recupero ID studente: HTTP ${response.status}`
+        );
+    }
+
+    return await response.text();
+}
+
 async getStudentSummary(session) {
 
     const url =`${BASE_URL}/esis/caricaMenu.do?azione=riepilogoEsamiCrediti`;
@@ -273,6 +295,19 @@ async getStudentSummary(session) {
     }
     return await response.text();
     }
+    
+    async getDegreeCourse(session) {
+        const url = `${BASE_URL}/esis/caricaMenu.do?azione=menu`;
+        const response = await this.get(session, url);
+
+        if (!response.ok) {
+            throw new Error(
+                `Errore recupero corso di laurea: HTTP ${response.status}`
+            );
+        }
+
+        return await response.text();
+    }   
 }
 
 export default new SegrepassClient();

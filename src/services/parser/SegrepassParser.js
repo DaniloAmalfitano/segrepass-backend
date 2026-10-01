@@ -79,8 +79,50 @@ class SegrepassParser {
             .get()
             .filter(Boolean);
     }
+    async parseStudentName(html) {
+        const $ = cheerio.load(html);
+
+        return $("p.navigationbar strong")
+            .text()
+            .replace(/\u00a0/g, " ")
+            .replace(/^\s*Benvenuto\/a:\s*/i, "")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
+    async parseStudentId(html) {
+        const $ = cheerio.load(html);
+        const selectedOption = $("#carriera option:checked").first();
+        const option = selectedOption.length
+            ? selectedOption
+            : $("#carriera option[selected]").first();
+
+        return option.length ? option.text().trim() : null;
+    }
+
+    async parseDegreeCourse(html) {
+        const $ = cheerio.load(html);
+        let course = null;
+
+        $("p.textcontent").each((_, paragraph) => {
+            const text = $(paragraph)
+                .text()
+                .replace(/\u00a0/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+            const match = text.match(/\bCorso\s+di\s+laurea\s*:\s*(.+)$/i);
+
+            if (match && match[1].trim()) {
+                course = match[1].trim();
+                return false;
+            }
+        });
+
+        return course;
+    }
+            
     
-    parseStudentSummary(html) {
+    async parseStudentSummary(html) {
         const $ = cheerio.load(html);
 
         const texts = $("table.tabella td").map((_, td) => $(td).text().replace(/\u00a0/g, " ").trim()).get();

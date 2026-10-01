@@ -157,3 +157,82 @@ export async function getStudentSummary(req, res) {
         });
     }
 }
+
+export async function getStudentName(req, res) {
+    try{
+        const sessionId = req.sessionId;
+        const session = await SessionManager.get(sessionId);
+
+        if (!session) {
+            return res.status(401).json({
+                error: "Nessuna connessione a Segrepass"
+            });
+        }
+
+        const html = await SegrepassClient.getStudentName(session);
+        const studentName = await SegrepassParser.parseStudentName(html);
+
+        return res.status(200).json({
+            studentName
+        });
+    } catch (error) {
+        console.error(error);
+        
+        return res.status(500).json({
+            error: "Errore durante il recupero del nome studente"
+        });
+    }   
+}
+
+export async function getStudentId(req, res) {
+    try {
+        const sessionId = req.sessionId;
+        const session = await SessionManager.get(sessionId);
+
+        if (!session) {
+            return res.status(401).json({
+                error: "Nessuna connessione a Segrepass"
+            });
+        }
+
+        const html = await SegrepassClient.getStudentId(session);
+        const studentId = await SegrepassParser.parseStudentId(html);
+
+        return res.status(200).json({
+            studentId
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            error: "Errore durante il recupero dell'ID studente"
+        });
+    }
+}
+
+export async function getDegreeCourse(req, res) {
+    try {
+        const sessionId = req.sessionId;
+        const session = await SessionManager.get(sessionId);
+
+        if (!session) {
+            return res.status(401).json({
+                error: "Nessuna connessione a Segrepass"
+            });
+        }
+
+        const html = await SegrepassClient.getDegreeCourse(session);
+        const degreeCourse = await SegrepassParser.parseDegreeCourse(html);
+
+        return res.status(200).json({
+            degreeCourse
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            error: "Errore durante il recupero dell'ID studente"
+        });
+    }
+
+}   
