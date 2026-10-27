@@ -65,7 +65,8 @@ class SegrepassClient {
                 BASE_URL
             );
         }
-        const form =$("#formCredenzialiIstituzionali");
+        //const form =$("#formCredenzialiIstituzionali");
+ const form =$("#LoginForm");
 
         if (!form.length) {
             throw new Error(
