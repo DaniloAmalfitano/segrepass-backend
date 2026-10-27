@@ -2,7 +2,7 @@ import { CookieJar } from "tough-cookie";
 import { Agent } from "undici";
 import * as cheerio from "cheerio";
 
-const BASE_URL = "https://www.segrepass3.unina.it";
+const BASE_URL = "https://www.segrepass1.unina.it";
 
 const TIMEOUT_MS = 60000;
 
@@ -65,8 +65,8 @@ class SegrepassClient {
                 BASE_URL
             );
         }
-        //const form =$("#formCredenzialiIstituzionali");
- const form =$("#LoginForm");
+        const form =$("#formCredenzialiIstituzionali");
+        //const form =$("#LoginForm");
 
         if (!form.length) {
             throw new Error(
